@@ -6,6 +6,7 @@ import type { Competition, User } from '../types';
 import { schools } from '../lib/mockData';
 import { motion } from 'framer-motion';
 import PageTransition from '../components/PageTransition';
+import ParticipantsModal from '../components/ParticipantsModal';
 
 export default function CompetitionDetail() {
   const { id } = useParams<{ id: string }>();
@@ -15,6 +16,11 @@ export default function CompetitionDetail() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   
+  // New state for managing participants and joining
+  const [showParticipantsModal, setShowParticipantsModal] = useState(false);
+  const [isJoining, setIsJoining] = useState(false);
+  const [hasJoined, setHasJoined] = useState(false);
+
   useEffect(() => {
     const fetchCompetition = async () => {
       if (!id || !user) return;
@@ -23,6 +29,13 @@ export default function CompetitionDetail() {
       try {
         const data = await api.getCompetition(id, user);
         setCompetition(data);
+        
+        // Check if user has already joined the competition
+        if (user.role === 'STUDENT') {
+          const joined = await api.hasJoinedCompetition(id, user);
+          setHasJoined(joined);
+        }
+        
         setError('');
       } catch (err) {
         console.error('Failed to fetch competition:', err);
@@ -43,9 +56,30 @@ export default function CompetitionDetail() {
   const handleEditClick = () => {
     // In a real application, you would navigate to an edit page or show an edit form
     alert("Edit functionality would be implemented here in a real application.");
-    // You could also navigate to an edit page:
-    // navigate(`/competitions/${competition.id}/edit`);
   };  
+  
+  // Handler for joining a competition
+  const handleJoinCompetition = async () => {
+    if (!user || !competition || !id) return;
+    
+    setIsJoining(true);
+    try {
+      await api.joinCompetition(id, user);
+      setHasJoined(true);
+      // Show a success message or notification
+      alert('You have successfully joined this competition!');
+    } catch (err: any) {
+      console.error('Failed to join competition:', err);
+      alert(`Failed to join competition: ${err.message || 'Please try again.'}`);
+    } finally {
+      setIsJoining(false);
+    }
+  };
+  
+  // Handler for managing participants
+  const handleManageParticipants = () => {
+    setShowParticipantsModal(true);
+  };
   
   // Check if this is the user's school's competition
   const isOwnSchoolCompetition = user?.schoolId === competition?.ownerSchoolId;
@@ -294,10 +328,11 @@ export default function CompetitionDetail() {
                   <motion.button 
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
+                    onClick={handleManageParticipants}
                     className="w-full flex items-center justify-center px-4 py-2 border border-[#bb945c] text-sm font-medium rounded-md text-[#bb945c] bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#bb945c] transition-colors duration-200"
                   >
                     <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                     </svg>
                     Manage Participants
                   </motion.button>
@@ -322,12 +357,35 @@ export default function CompetitionDetail() {
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-[#bb945c] hover:bg-[#a07e4a] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#bb945c] w-full md:w-auto transition-colors duration-200"
+                  onClick={handleJoinCompetition}
+                  disabled={isJoining || hasJoined}
+                  className={`flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-[#bb945c] hover:bg-[#a07e4a] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#bb945c] w-full md:w-auto transition-colors duration-200 ${
+                    (isJoining || hasJoined) ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
                 >
-                  <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" />
-                  </svg>
-                  Join Competition
+                  {isJoining ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Joining...
+                    </>
+                  ) : hasJoined ? (
+                    <>
+                      <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                      Joined
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" />
+                      </svg>
+                      Join Competition
+                    </>
+                  )}
                 </motion.button>
               </div>
             </motion.div>
@@ -353,6 +411,13 @@ export default function CompetitionDetail() {
           </motion.div>
         </div>
       </div>
+
+      {/* Participants Modal */}
+      <ParticipantsModal
+        competitionId={id || ''}
+        isOpen={showParticipantsModal}
+        onClose={() => setShowParticipantsModal(false)}
+      />
     </PageTransition>
   );
 }

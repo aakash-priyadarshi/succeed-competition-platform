@@ -1,6 +1,9 @@
-// src/lib/api.ts
+// Update the API service in src/lib/api.ts to add these functions
 import type { Competition, User, CompetitionFormData } from '../types';
-import { competitions as mockCompetitions } from './mockData';
+import { competitions as mockCompetitions, users } from './mockData';
+
+// Track joined competitions for the prototype
+const joinedCompetitions = new Map<string, Set<string>>();
 
 /**
  * Helper function to check if a user can access a competition based on
@@ -52,41 +55,42 @@ export const api = {
   /**
    * Get all competitions visible to the current user
    */
-getCompetitions: async (user: User): Promise<Competition[]> => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 300));
-  
-  if (!user) {
-    return [];
-  }
-  
-  // Platform admins can see all competitions
-  if (user.role === 'PLATFORM_ADMIN') {
-    return [...mockCompetitions];
-  }
-  
-  // Use the helper function to filter competitions
-  return mockCompetitions.filter(comp => canUserAccessCompetition(user, comp));
-},
+  getCompetitions: async (user: User): Promise<Competition[]> => {
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    if (!user) {
+      return [];
+    }
+    
+    // Platform admins can see all competitions
+    if (user.role === 'PLATFORM_ADMIN') {
+      return [...mockCompetitions];
+    }
+    
+    // Use the helper function to filter competitions
+    return mockCompetitions.filter(comp => canUserAccessCompetition(user, comp));
+  },
 
-getCompetition: async (id: string, user: User): Promise<Competition> => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 200));
+  getCompetition: async (id: string, user: User): Promise<Competition> => {
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 200));
+    
+    const competition = mockCompetitions.find(c => c.id === id);
+    
+    if (!competition) {
+      throw new Error('Competition not found');
+    }
+    
+    // Use the helper function to check access
+    if (canUserAccessCompetition(user, competition)) {
+      return { ...competition };
+    }
+    
+    throw new Error('You do not have permission to view this competition');
+  },
   
-  const competition = mockCompetitions.find(c => c.id === id);
-  
-  if (!competition) {
-    throw new Error('Competition not found');
-  }
-  
-  // Use the helper function to check access
-  if (canUserAccessCompetition(user, competition)) {
-    return { ...competition };
-  }
-  
-  throw new Error('You do not have permission to view this competition');
-},
-/**
+  /**
    * Create a new competition
    */
   createCompetition: async (data: CompetitionFormData, user: User): Promise<Competition> => {
@@ -131,5 +135,82 @@ getCompetition: async (id: string, user: User): Promise<Competition> => {
     mockCompetitions.push(newCompetition);
     
     return { ...newCompetition };
+  },
+  
+  /**
+   * Join a competition
+   */
+  joinCompetition: async (competitionId: string, user: User): Promise<void> => {
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    if (!user) {
+      throw new Error('You must be logged in to join a competition');
+    }
+    
+    if (user.role !== 'STUDENT') {
+      throw new Error('Only students can join competitions');
+    }
+    
+    const competition = mockCompetitions.find(c => c.id === competitionId);
+    
+    if (!competition) {
+      throw new Error('Competition not found');
+    }
+    
+    // Check if user has access to this competition
+    if (!canUserAccessCompetition(user, competition)) {
+      throw new Error('You do not have permission to join this competition');
+    }
+    
+    // Track the join in our mock data structure
+    if (!joinedCompetitions.has(competitionId)) {
+      joinedCompetitions.set(competitionId, new Set<string>());
+    }
+    
+    joinedCompetitions.get(competitionId)?.add(user.id);
+    
+    return Promise.resolve();
+  },
+  
+  /**
+   * Check if a user has joined a competition
+   */
+  hasJoinedCompetition: async (competitionId: string, user: User): Promise<boolean> => {
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    if (!user) {
+      return false;
+    }
+    
+    const participants = joinedCompetitions.get(competitionId);
+    
+    if (!participants) {
+      return false;
+    }
+    
+    return participants.has(user.id);
+  },
+  
+  /**
+   * Get participants for a competition
+   */
+  getCompetitionParticipants: async (competitionId: string): Promise<User[]> => {
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    const participantIds = joinedCompetitions.get(competitionId);
+    
+    if (!participantIds || participantIds.size === 0) {
+      // For the prototype, we'll return some mock participants
+      // In a real app, this would return an empty array or actual participants
+      return users
+        .filter(u => u.role === 'STUDENT')
+        .slice(0, 3);
+    }
+    
+    // In a real app, we would query the database for users with these IDs
+    return users.filter(u => participantIds.has(u.id));
   }
 };
