@@ -1,13 +1,10 @@
-// src/pages/Login.tsx
+// src/pages/Login.tsx - Updated with video background
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { users } from '../lib/mockData';
 import { motion } from 'framer-motion';
-
-// Import a video or provide a URL - use a public URL for a placeholder
-const backgroundVideoUrl = "https://youtu.be/dUlynwxb12c"; 
-// You can replace this with your own video URL
+import VideoBackground from '../components/VideoBackground';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -57,21 +54,9 @@ export default function Login() {
   };
   
   return (
-    <div className="min-h-screen relative flex items-center justify-center bg-secondary overflow-hidden">
-      {/* Background Video */}
-      <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-black bg-opacity-70 z-10"></div>
-        <video 
-          className="absolute min-w-full min-h-full object-cover"
-          autoPlay
-          loop
-          muted
-          playsInline
-        >
-          <source src={backgroundVideoUrl} type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
-      </div>
+    <div className="min-h-screen relative flex items-center justify-center overflow-hidden">
+      {/* Video Background */}
+      <VideoBackground />
       
       {/* Login Container */}
       <div className="w-full max-w-md z-20">
@@ -79,12 +64,12 @@ export default function Login() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="bg-white rounded-lg shadow-2xl overflow-hidden"
+          className="bg-white/90 backdrop-blur-sm rounded-lg shadow-2xl overflow-hidden"
         >
           {/* Header */}
-          <div className="bg-secondary px-6 py-8 text-center">
-            <h1 className="text-3xl font-bold text-primary">Succeed Platform</h1>
-            <p className="mt-2 text-white opacity-80">Manage school competitions with ease</p>
+          <div className="bg-primary/90 px-6 py-8 text-center">
+            <h1 className="text-3xl font-bold text-white">Succeed Platform</h1>
+            <p className="mt-2 text-white/80">Manage school competitions with ease</p>
           </div>
           
           <div className="px-6 py-8">
