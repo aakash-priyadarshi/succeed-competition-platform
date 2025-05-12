@@ -22,10 +22,10 @@ export const schools: School[] = [
   }
 ];
 
-/**
- * Mock users data
- */
+// src/lib/mockData.ts
+// Add student users to the mock data
 export const users: User[] = [
+  // School Admins
   {
     id: '1',
     email: 'admin@springfield.edu',
@@ -50,6 +50,7 @@ export const users: User[] = [
     role: 'SCHOOL_ADMIN',
     schoolId: '3'
   },
+  // Platform Admin
   {
     id: '4',
     email: 'admin@succeed.com',
@@ -57,6 +58,31 @@ export const users: User[] = [
     lastName: 'User',
     role: 'PLATFORM_ADMIN',
     schoolId: null
+  },
+  // Students
+  {
+    id: '5',
+    email: 'student@springfield.edu',
+    firstName: 'Alex',
+    lastName: 'Wilson',
+    role: 'STUDENT',
+    schoolId: '1'
+  },
+  {
+    id: '6',
+    email: 'student@riverdale.edu',
+    firstName: 'Megan',
+    lastName: 'Brown',
+    role: 'STUDENT',
+    schoolId: '2'
+  },
+  {
+    id: '7',
+    email: 'student@westview.edu',
+    firstName: 'Chris',
+    lastName: 'Lee',
+    role: 'STUDENT',
+    schoolId: '3'
   }
 ];
 

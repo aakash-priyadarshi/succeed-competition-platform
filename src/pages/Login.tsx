@@ -1,18 +1,38 @@
-import { useState } from 'react';
+// src/pages/Login.tsx
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { users } from '../lib/mockData';
+import { motion } from 'framer-motion';
+
+// Import a video or provide a URL - use a public URL for a placeholder
+const backgroundVideoUrl = "https://youtu.be/dUlynwxb12c"; 
+// You can replace this with your own video URL
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const navigate = useNavigate();
+  
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      navigate('/competitions');
+    }
+  }, [user, navigate]);
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!email) {
+      setError('Please enter an email address or select a user.');
+      return;
+    }
+    
     setError('');
     setIsLoading(true);
     
@@ -31,75 +51,176 @@ export default function Login() {
     }
   };
   
+  const handleUserSelect = (userId: string, userEmail: string) => {
+    setSelectedUserId(userId);
+    setEmail(userEmail);
+  };
+  
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold">Succeed Competition Platform</h1>
-          <p className="text-gray-600">Log in to manage competitions</p>
-        </div>
-        
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
-            {error}
-          </div>
-        )}
-        
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-              Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
+    <div className="min-h-screen relative flex items-center justify-center bg-secondary overflow-hidden">
+      {/* Background Video */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 bg-black bg-opacity-70 z-10"></div>
+        <video 
+          className="absolute min-w-full min-h-full object-cover"
+          autoPlay
+          loop
+          muted
+          playsInline
+        >
+          <source src={backgroundVideoUrl} type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+      </div>
+      
+      {/* Login Container */}
+      <div className="w-full max-w-md z-20">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="bg-white rounded-lg shadow-2xl overflow-hidden"
+        >
+          {/* Header */}
+          <div className="bg-secondary px-6 py-8 text-center">
+            <h1 className="text-3xl font-bold text-primary">Succeed Platform</h1>
+            <p className="mt-2 text-white opacity-80">Manage school competitions with ease</p>
           </div>
           
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-              Password
-            </label>
-            <input
-              id="password"
-              type="password"
-              value="password" // Fixed password for the prototype
-              className="w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-100"
-              disabled
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              For this prototype, the password field is pre-filled and disabled.
+          <div className="px-6 py-8">
+            {error && (
+              <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 mb-6">
+                <div className="flex">
+                  <div className="flex-shrink-0">
+                    <svg className="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm">{error}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                  placeholder="Enter your email"
+                />
+              </div>
+              
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                  Password
+                </label>
+                <input
+                  type="password"
+                  id="password"
+                  value="password" // Fixed for prototype
+                  disabled
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50"
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                  For this prototype, password is pre-filled and authentication is simulated.
+                </p>
+              </div>
+              
+              <div>
+                <button
+                  type="submit"
+                  disabled={isLoading || !email}
+                  className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primaryDark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors ${
+                    (isLoading || !email) ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+                >
+                  {isLoading ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Signing in...
+                    </>
+                  ) : 'Sign In'}
+                </button>
+              </div>
+            </form>
+          </div>
+          
+          {/* Quick Access Section */}
+          <div className="px-6 pb-8">
+            <div className="relative my-4">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">Quick access</span>
+              </div>
+            </div>
+            
+            <div className="mt-4 space-y-2">
+              <p className="text-sm text-gray-600">Select a user to auto-fill login credentials:</p>
+              <div className="grid grid-cols-1 gap-2">
+                {users.map((demoUser) => (
+                  <motion.button
+                    key={demoUser.id}
+                    whileHover={{ scale: 1.02, boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)" }}
+                    whileTap={{ scale: 0.98 }}
+                    type="button"
+                    onClick={() => handleUserSelect(demoUser.id, demoUser.email)}
+                    className={`flex items-center justify-between px-4 py-3 border ${
+                      selectedUserId === demoUser.id
+                        ? 'border-primary bg-primary bg-opacity-10 ring-2 ring-primary ring-opacity-50'
+                        : 'border-gray-200 hover:bg-gray-50'
+                    } rounded-lg text-left`}
+                  >
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0">
+                        <div className={`h-10 w-10 rounded-full flex items-center justify-center text-white ${
+                          demoUser.role === 'SCHOOL_ADMIN' ? 'bg-primary' : 
+                          demoUser.role === 'STUDENT' ? 'bg-blue-500' : 'bg-secondary'
+                        }`}>
+                          {demoUser.firstName[0]}{demoUser.lastName[0]}
+                        </div>
+                      </div>
+                      <div className="ml-3">
+                        <p className="text-sm font-medium text-gray-900">{demoUser.firstName} {demoUser.lastName}</p>
+                        <p className="text-xs text-gray-500">{demoUser.email}</p>
+                      </div>
+                    </div>
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      demoUser.role === 'SCHOOL_ADMIN' 
+                        ? 'bg-primary bg-opacity-20 text-primary' 
+                        : demoUser.role === 'PLATFORM_ADMIN'
+                        ? 'bg-secondary bg-opacity-20 text-secondary'
+                        : 'bg-blue-100 text-blue-800'
+                    }`}>
+                      {demoUser.role === 'SCHOOL_ADMIN' ? 'School Admin' : 
+                       demoUser.role === 'PLATFORM_ADMIN' ? 'Platform Admin' : 'Student'}
+                    </span>
+                  </motion.button>
+                ))}
+              </div>
+            </div>
+          </div>
+          
+          {/* Footer */}
+          <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 text-center">
+            <p className="text-xs text-gray-500">
+              This is a prototype for the Succeed competition platform assessment.
+              <br />No real authentication is implemented.
             </p>
           </div>
-          
-          <button
-            type="submit"
-            disabled={isLoading}
-            className={`w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-              isLoading ? 'opacity-70 cursor-not-allowed' : ''
-            }`}
-          >
-            {isLoading ? 'Logging in...' : 'Log In'}
-          </button>
-        </form>
-        
-        <div className="mt-6">
-          <p className="text-sm font-medium text-gray-700 mb-2">Sample Accounts:</p>
-          <div className="bg-gray-50 p-3 rounded-md border border-gray-200">
-            <ul className="text-sm text-gray-600 space-y-1">
-              {users.map((user) => (
-                <li key={user.id} className="flex justify-between">
-                  <span>{user.email}</span>
-                  <span className="text-gray-500">{user.role}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

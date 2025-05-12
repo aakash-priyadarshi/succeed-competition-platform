@@ -1,9 +1,13 @@
+// src/pages/CompetitionCreate.tsx
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../lib/api';
 import type { CompetitionFormData, Visibility } from '../types';
 import { schools } from '../lib/mockData';
+import Card, { CardHeader, CardBody, CardFooter } from '../components/Card';
+import Button from '../components/Button';
+import { Input, Textarea, Select } from '../components/FormElements';
 
 export default function CompetitionCreate() {
   const { user } = useAuth();
@@ -61,9 +65,16 @@ export default function CompetitionCreate() {
       return;
     }
     
+    // For restricted visibility, ensure at least one school is selected
+    if (visibility === 'RESTRICTED' && accessibleSchools.length === 0) {
+      setError('Please select at least one school for restricted visibility');
+      return;
+    }
+    
     setIsSubmitting(true);
     setError('');
     
+    // Prepare form data
     const formData: CompetitionFormData = {
       title,
       description,
@@ -74,11 +85,14 @@ export default function CompetitionCreate() {
     };
     
     try {
-      await api.createCompetition(formData, user);
+      console.log('Creating competition with data:', formData);
+      // Make sure user is passed to the API call
+      const newCompetition = await api.createCompetition(formData, user);
+      console.log('Competition created:', newCompetition);
       navigate('/competitions');
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to create competition:', err);
-      setError('Failed to create competition. Please try again.');
+      setError(`Failed to create competition: ${err.message || 'Unknown error'}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -98,12 +112,13 @@ export default function CompetitionCreate() {
       <div className="bg-red-50 border border-red-200 text-red-700 p-6 rounded">
         <h2 className="text-lg font-medium mb-2">Permission Denied</h2>
         <p>You do not have permission to create competitions.</p>
-        <button
+        <Button 
+          variant="outline" 
           onClick={() => navigate('/competitions')}
-          className="mt-4 text-blue-600 hover:text-blue-800"
+          className="mt-4"
         >
           Return to Competitions
-        </button>
+        </Button>
       </div>
     );
   }
@@ -113,180 +128,122 @@ export default function CompetitionCreate() {
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Create New Competition</h1>
       
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
+        <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 mb-6">
           {error}
         </div>
       )}
       
-      <div className="bg-white shadow rounded-lg overflow-hidden">
-        <form onSubmit={handleSubmit} className="p-6">
-          <div className="space-y-6">
-            <div>
-              <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
-                Title
-              </label>
-              <input
-                id="title"
-                type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      <Card>
+        <form onSubmit={handleSubmit}>
+          <CardHeader>
+            <h2 className="text-lg font-medium">Competition Details</h2>
+          </CardHeader>
+          
+          <CardBody>
+            <Input
+              id="title"
+              label="Competition Title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Enter competition title"
+              required
+            />
+            
+            <Textarea
+              id="description"
+              label="Description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Provide details about the competition"
+              rows={4}
+              required
+            />
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Input
+                id="startDate"
+                label="Start Date"
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
                 required
               />
-            </div>
-            
-            <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-                Description
-              </label>
-              <textarea
-                id="description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={4}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 mb-1">
-                  Start Date
-                </label>
-                <input
-                  id="startDate"
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                />
-              </div>
               
-              <div>
-                <label htmlFor="endDate" className="block text-sm font-medium text-gray-700 mb-1">
-                  End Date
-                </label>
-                <input
-                  id="endDate"
-                  type="date"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                />
-              </div>
+              <Input
+                id="endDate"
+                label="End Date"
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                required
+              />
             </div>
             
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Visibility
-              </label>
-              <div className="space-y-2">
-                <div className="flex items-center">
-                  <input
-                    id="private"
-                    type="radio"
-                    value="PRIVATE"
-                    checked={visibility === 'PRIVATE'}
-                    onChange={() => setVisibility('PRIVATE')}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                  />
-                  <label htmlFor="private" className="ml-2 block text-sm text-gray-700">
-                    Private - Only visible to your school
-                  </label>
-                </div>
-                
-                <div className="flex items-center">
-                  <input
-                    id="public"
-                    type="radio"
-                    value="PUBLIC"
-                    checked={visibility === 'PUBLIC'}
-                    onChange={() => setVisibility('PUBLIC')}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                  />
-                  <label htmlFor="public" className="ml-2 block text-sm text-gray-700">
-                    Public - Visible to all schools
-                  </label>
-                </div>
-                
-                <div className="flex items-center">
-                  <input
-                    id="restricted"
-                    type="radio"
-                    value="RESTRICTED"
-                    checked={visibility === 'RESTRICTED'}
-                    onChange={() => setVisibility('RESTRICTED')}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                  />
-                  <label htmlFor="restricted" className="ml-2 block text-sm text-gray-700">
-                    Restricted - Visible to selected schools
-                  </label>
-                </div>
-              </div>
-            </div>
+            <Select
+              id="visibility"
+              label="Visibility"
+              value={visibility}
+              onChange={(e) => setVisibility(e.target.value as Visibility)}
+              options={[
+                { value: 'PRIVATE', label: 'Private - Only visible to your school' },
+                { value: 'PUBLIC', label: 'Public - Visible to all schools' },
+                { value: 'RESTRICTED', label: 'Restricted - Visible to selected schools' },
+              ]}
+            />
             
             {visibility === 'RESTRICTED' && (
-              <div>
+              <div className="mt-4">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Select Schools with Access
                 </label>
-                <div className="border border-gray-300 rounded-md p-4 max-h-60 overflow-y-auto">
-                  {selectableSchools.length === 0 ? (
-                    <p className="text-gray-500 text-sm">No other schools available</p>
-                  ) : (
-                    <div className="space-y-2">
-                      {selectableSchools.map(school => (
-                        <div key={school.id} className="flex items-center">
-                          <input
-                            id={`school-${school.id}`}
-                            type="checkbox"
-                            checked={accessibleSchools.includes(school.id)}
-                            onChange={() => handleSchoolSelection(school.id)}
-                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                          />
-                          <label htmlFor={`school-${school.id}`} className="ml-2 block text-sm text-gray-700">
-                            {school.name}
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                {selectableSchools.length === 0 ? (
+                  <p className="text-sm text-gray-500">No other schools available</p>
+                ) : (
+                  <div className="space-y-2 border border-gray-200 rounded-md p-4 max-h-60 overflow-y-auto">
+                    {selectableSchools.map(school => (
+                      <div key={school.id} className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id={`school-${school.id}`}
+                          checked={accessibleSchools.includes(school.id)}
+                          onChange={() => handleSchoolSelection(school.id)}
+                          className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                        />
+                        <label htmlFor={`school-${school.id}`} className="ml-2 block text-sm text-gray-700">
+                          {school.name}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                )}
                 {visibility === 'RESTRICTED' && accessibleSchools.length === 0 && (
-                  <p className="text-sm text-red-500 mt-1">
+                  <p className="mt-1 text-sm text-red-600">
                     Please select at least one school or change visibility.
                   </p>
                 )}
               </div>
             )}
+          </CardBody>
+          
+          <CardFooter className="flex justify-end space-x-3">
+            <Button 
+              type="button" 
+              variant="secondary" 
+              onClick={() => navigate('/competitions')}
+            >
+              Cancel
+            </Button>
             
-            <div className="flex justify-end space-x-3 pt-4 border-t">
-              <button
-                type="button"
-                onClick={() => navigate('/competitions')}
-                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-              >
-                Cancel
-              </button>
-              
-              <button
-                type="submit"
-                disabled={isSubmitting || (visibility === 'RESTRICTED' && accessibleSchools.length === 0)}
-                className={`px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                  (isSubmitting || (visibility === 'RESTRICTED' && accessibleSchools.length === 0)) 
-                    ? 'opacity-70 cursor-not-allowed' 
-                    : ''
-                }`}
-              >
-                {isSubmitting ? 'Creating...' : 'Create Competition'}
-              </button>
-            </div>
-          </div>
+            <Button
+              type="submit"
+              isLoading={isSubmitting}
+              disabled={isSubmitting || (visibility === 'RESTRICTED' && accessibleSchools.length === 0)}
+            >
+              Create Competition
+            </Button>
+          </CardFooter>
         </form>
-      </div>
+      </Card>
     </div>
   );
 }
