@@ -9,9 +9,7 @@
   
 </div>
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/yourusername/succeed-competition-platform/main/public/logo.png" alt="Succeed Platform Logo" width="200"/>
-</p>
+
 
 <p align="center">
   A sophisticated multi-tenant competition platform enabling educational institutions to create, manage, and participate in academic competitions with powerful isolation and visibility controls.
@@ -50,8 +48,8 @@
 | <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/react/react-original.svg" width="20" height="20"/> React 19 | UI Library | [Docs](https://react.dev) |
 | <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/typescript/typescript-original.svg" width="20" height="20"/> TypeScript | Type Safety | [Docs](https://www.typescriptlang.org/docs/) |
 | <img src="https://vitejs.dev/logo.svg" width="20" height="20"/> Vite | Build Tool | [Docs](https://vitejs.dev/) |
-| <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/tailwindcss/tailwindcss-plain.svg" width="20" height="20"/> TailwindCSS | Styling | [Docs](https://tailwindcss.com/docs) |
-| <img src="https://www.framer.com/images/favicons/favicon.svg" width="20" height="20"/> Framer Motion | Animations | [Docs](https://www.framer.com/motion/) |
+| <img src="https://tailwindcss.com/_next/static/media/tailwindcss-mark.d52e9897.svg" width="20" height="20"/> TailwindCSS | Styling | [Docs](https://tailwindcss.com/docs) |
+| <img src="https://cdn.worldvectorlogo.com/logos/framer-motion.svg" width="20" height="20"/> Framer Motion | Animations | [Docs](https://www.framer.com/motion/) |
 | <img src="https://reactrouter.com/favicon.ico" width="20" height="20"/> React Router | Routing | [Docs](https://reactrouter.com/) |
 | <img src="https://react-hook-form.com/images/logo/react-hook-form-logo-only.svg" width="20" height="20"/> React Hook Form | Form Handling | [Docs](https://react-hook-form.com/) |
 | <img src="https://raw.githubusercontent.com/colinhacks/zod/master/logo.svg" width="20" height="20"/> Zod | Validation | [Docs](https://zod.dev/) |
@@ -107,7 +105,7 @@ The platform leverages:
    npm run dev
    ```
 
-4. Open [http://localhost:3000](http://localhost:3000) in your browser
+4. Open [http://localhost:5173](http://localhost:5173) in your browser
 
 ## 💻 Development
 
@@ -241,5 +239,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 <p align="center">
-  Made with ❤️ by [Your Name]
+  Made with ❤️ by [Aakash Priyadarshi](http://aakash-priyadarshi.github.io/)
 </p>
