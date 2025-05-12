@@ -2,9 +2,9 @@
 
 <div align="center">
   
-![GitHub stars](https://img.shields.io/github/stars/yourusername/succeed-competition-platform?style=for-the-badge)
-![GitHub forks](https://img.shields.io/github/forks/yourusername/succeed-competition-platform?style=for-the-badge)
-![GitHub issues](https://img.shields.io/github/issues/yourusername/succeed-competition-platform?style=for-the-badge)
+![GitHub stars](https://img.shields.io/github/stars/aakash-priyadarshi/succeed-competition-platform?style=for-the-badge)
+![GitHub forks](https://img.shields.io/github/forks/aakash-priyadarshi/succeed-competition-platform?style=for-the-badge)
+![GitHub issues](https://img.shields.io/github/issues/aakash-priyadarshi/succeed-competition-platform?style=for-the-badge)
 ![License](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)
   
 </div>
@@ -91,7 +91,7 @@ The platform leverages:
 
 1. Clone the repository
    ```bash
-   git clone https://github.com/yourusername/succeed-competition-platform.git
+   git clone https://github.com/aakash-priyadarshi/succeed-competition-platform.git
    cd succeed-competition-platform
    ```
 
