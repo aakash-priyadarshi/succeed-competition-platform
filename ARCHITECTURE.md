@@ -210,4 +210,6 @@ GitHub Copilot and ChatGPT can significantly enhance development workflow:
    - Help document tenant isolation patterns
    - Create user guides for different roles
 
-The architecture described above provides a robust foundation for a multi-tenant competition platform that can scale efficiently while maintaining strong security boundaries between tenants.
+<p align="center">
+  Made with ❤️ by [Aakash Priyadarshi](http://aakash-priyadarshi.github.io/)
+</p>
