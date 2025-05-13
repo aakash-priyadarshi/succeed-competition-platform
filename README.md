@@ -239,5 +239,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 <p align="center">
-  Made with ❤️ by [Aakash Priyadarshi](http://aakash-priyadarshi.github.io/)
+  Made with ❤️ by <a href="http://aakash-priyadarshi.github.io/">Aakash Priyadarshi</a>
 </p>
