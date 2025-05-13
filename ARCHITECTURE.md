@@ -226,5 +226,5 @@ GitHub Copilot and ChatGPT can significantly enhance development workflow:
    - Create user guides for different roles
 
 <p align="center">
-  Made with ❤️ by [Aakash Priyadarshi](http://aakash-priyadarshi.github.io/)
+  Made with ❤️ by <a href="http://aakash-priyadarshi.github.io/">Aakash Priyadarshi</a>
 </p>
