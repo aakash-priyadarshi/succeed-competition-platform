@@ -85,6 +85,21 @@ Access control is enforced at multiple layers:
 
 ## Technical Implementation
 
+### Database Schema
+
+The diagram below illustrates the core database schema supporting our multi-tenant architecture:
+
+![Database Schema](database.png)
+
+*Figure 1: Database schema showing relationships between entities with tenant isolation through ownerSchoolId*
+
+Key aspects of this schema:
+- The `ownerSchoolId` foreign key in the Competitions table enforces tenant ownership
+- Users are associated with their school tenant through the `schoolId` field (null for platform admins)
+- The CompetitionSchoolAccess junction table enables controlled cross-tenant visibility
+- CompetitionParticipants tracks which students have joined competitions while respecting tenant boundaries
+
+
 ### Database Layer
 
 1. **Row-Level Security (RLS)**
