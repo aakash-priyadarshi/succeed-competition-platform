@@ -5,8 +5,9 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
-    <!-- Preload the video for faster initial loading -->
-    <link rel="preload" href="/videos/background-low.mp4" as="video" type="video/mp4" />
+    <!-- Improved video preloading -->
+    <link rel="preload" href="/videos/background-low.mp4" as="video" type="video/mp4" fetchpriority="high" />
+    <link rel="preload" href="/videos/background-medium.mp4" as="video" type="video/mp4" fetchpriority="high" />
     
     <title>Succeed Competition Platform</title>
   </head>

@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react';
+// src/components/VideoBackground.tsx (Improved)
+import { useState, useEffect, useRef } from 'react';
 
 const VideoBackground = () => {
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
   
   useEffect(() => {
     // Check if we're on a mobile device or slow connection
@@ -13,17 +15,44 @@ const VideoBackground = () => {
     checkMobile();
     window.addEventListener('resize', checkMobile);
     
-    // Set up video loading event
-    const videoElement = document.getElementById('bg-video');
-    if (videoElement) {
-      const handleLoaded = () => setVideoLoaded(true);
-      videoElement.addEventListener('loadeddata', handleLoaded);
-      
-      return () => {
-        videoElement.removeEventListener('loadeddata', handleLoaded);
-        window.removeEventListener('resize', checkMobile);
-      };
-    }
+    // Preload the video to make it start more quickly
+    const preloadVideo = async () => {
+      try {
+        if (videoRef.current) {
+          // Force the video to load immediately
+          videoRef.current.load();
+          
+          // Handle when video can play
+          videoRef.current.oncanplay = () => {
+            setVideoLoaded(true);
+            
+            // Ensure video plays 
+            videoRef.current?.play().catch(err => {
+              console.error("Video playback error:", err);
+            });
+          };
+          
+          // Check regularly if the video has stopped unexpectedly
+          const videoCheckInterval = setInterval(() => {
+            if (videoRef.current && videoRef.current.paused && videoLoaded) {
+              videoRef.current.play().catch(err => {
+                console.error("Video restart error:", err);
+              });
+            }
+          }, 1000);
+          
+          return () => clearInterval(videoCheckInterval);
+        }
+      } catch (error) {
+        console.error("Video loading error:", error);
+      }
+    };
+    
+    preloadVideo();
+    
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+    };
   }, []);
 
   return (
@@ -42,11 +71,12 @@ const VideoBackground = () => {
       {/* Video background */}
       {!isMobile && (
         <video
-          id="bg-video"
+          ref={videoRef}
           autoPlay
           muted
           loop
           playsInline
+          preload="auto"
           className={`absolute min-w-full min-h-full object-cover transition-opacity duration-1000 ${
             videoLoaded ? 'opacity-100' : 'opacity-0'
           }`}
